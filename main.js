@@ -24,6 +24,7 @@ console.log('app.js is running');
 //#endregion
 
 //#region ------ SECOND EXAMPLE: BAR CHART ----
+/*
 const data = [
   { id: 'd1', value: 10, region: 'USA' },
   { id: 'd2', value: 17, region: 'India' },
@@ -67,7 +68,6 @@ const yScale =
   .domain([minValue - minValue * 0.2, maxValue + maxValue * 0.08])
   // Make the first value the max b/c D3's coordinate system starts in the upper left
   .range([svgHeight, 0]);
-  
 
 
 const container = d3.select('svg.chart')
@@ -110,5 +110,141 @@ setTimeout(() => {
     .exit()
     .remove();
 }, 1500);
+*/
+//#endregion
+
+
+//#region ----- THIRD EXAMPLE: Data-binding lesson ------
+// From this video: https://www.youtube.com/watch?v=ZOeWdkq-L90&list=PL55RiY5tL51r1NlkJLzVhui1S480gnuNG&index=4
+/*
+const countryData = {
+  items: ['China', 'India', 'USA'],
+  addItem(item) {
+    this.items.push(item);
+  },
+  removeItem(index) {
+    this.items.splice(index, 1);
+  },
+  updateItem(index, newItem) {
+    this.items[index] = newItem;
+  }
+};
+
+const itemSelector = 'li';
+
+const countryElements = d3
+  .select('.list')
+  .selectAll(itemSelector)
+  // The second argument to .data() specifies a unique key that should be associated with each
+  //  data item so that d3 can identify it later when comparing data changes.  If that key function
+  //  is not provided, then d3 just considers items in their index position, which usually leads
+  //  to problems.
+  .data(countryData.items, item => item)
+  .enter()
+  .append(itemSelector)
+  .text(item => item);
+
+setTimeout(() => {
+  countryData.addItem('Australia');
+  countryElements
+  .data(countryData.items, item => item)
+    .enter()
+    .append(itemSelector)
+    .classed('added', true)
+    .text(item => item);
+}, 1500);
+
+setTimeout(() => {
+  countryData.removeItem(0);
+
+  // This approach did not work here
+  // countryElements
+  //   .data(countryData.items)
+  //   .exit()
+  //   .classed('redundant', true);
+
+  d3
+    .select('.list')
+    .selectAll(itemSelector)
+    .data(countryData.items, item => item)
+    .exit()
+    .classed('redundant', true);
+}, 3000);
+
+setTimeout(() => {
+  countryData.updateItem(1, 'Russia');
+  d3
+    .select('.list')
+    .selectAll(itemSelector)
+    .data(countryData.items, item => item)
+    .exit()
+    .classed('updated', true)
+    //.text(item => item);
+    .text('Russia');
+}, 5000);
+*/
+
+//#endregion
+
+//#region ------- JOIN EXAMPLE by Mike Bostock --------
+// From: https://bost.ocks.org/mike/join/
+
+const data = [
+  { name: 'Chester', x:  5, y: 19 },
+  { name: 'Linda',   x: 15, y:  8 },
+  { name: 'Mike',    x:  2, y:  5 },
+  { name: 'Sara',    x: 18, y: 12 }
+];
+
+const maxX = d3.max(data, item => item.x);
+const minX = d3.min(data, item => item.x);
+const maxY = d3.max(data, item => item.y);
+const minY = d3.min(data, item => item.y);
+
+const circleRadius = 3;
+
+const domainMinX = minX - minX * 0.5;
+const domainMinY = minY - minY * 0.5;
+
+
+const svgWidth = 250,
+      svgHeight = 200;
+
+const xScale = d3.scaleLinear()
+  //.domain([0, maxX + maxX * 0.1])
+  .domain([domainMinX, maxX + maxX * 0.1])
+  .range([0, svgWidth]);
+
+const yScale = d3.scaleLinear()
+  .domain([domainMinY, maxY + maxY *0.1])
+  .range([0, svgHeight]);
+
+const container = d3
+  .select('.chart')
+  .attr('width', svgWidth)
+  .attr('height', svgHeight);
+
+const renderCircles = () => {
+  const circles = container
+    .selectAll('circle')
+    .data(data);
   
+  circles.exit().remove();
+  
+  circles.enter().append('circle').attr('r', circleRadius)
+    .merge(circles)
+      .attr('cx', d => xScale(d.x))
+      .attr('cy', d => yScale(d.y));
+      // .append('span')
+      // .text(item => item.name);
+}
+
+renderCircles();
+
+setTimeout(() => {
+  data[1] = { name: 'Larry', x: 8, y: 15 };
+  renderCircles();
+  console.log('setTimeout func done');
+}, 1500);
+
 //#endregion

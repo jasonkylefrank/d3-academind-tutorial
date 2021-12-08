@@ -7,6 +7,7 @@
   margin-top: 60px;
 }
 
+/* From the bar chart example */
 .container {
   border: 1px solid red;
   color: white;
@@ -14,4 +15,22 @@
 
 .bar {
   fill: #720570;
+}
+/* ------ */
+
+
+/* For the data-binding lesson */
+.added {
+  background-color: greenyellow;
+}
+.redundant {
+  background-color: lightcoral;
+}
+.updated {
+  background-color: orange;
+}
+/* ------ */
+
+.chart {
+  background-color: rgba(0,0,0, 0.06);
 }
